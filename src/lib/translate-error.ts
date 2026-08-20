@@ -71,6 +71,17 @@ export function translateError(err: any): TerminalAIError {
     );
   }
 
+  if (
+    err instanceof OpenAI.APIConnectionError ||
+    err instanceof OpenAI.APIConnectionTimeoutError
+  ) {
+    return new TerminalAIError(
+      ErrorCode.Connection,
+      "provider connection failed or timed out; try again shortly",
+      err,
+    );
+  }
+
   //  Try and get an error code...
   const code = err["code"];
 

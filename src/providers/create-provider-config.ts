@@ -23,6 +23,14 @@ export function createProviderConfig(
         baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
         model: "models/gemini-2.0-flash",
       };
+    case "anthropic":
+      return {
+        apiKey,
+        type: "anthropic",
+        name: "anthropic",
+        baseURL: "https://api.anthropic.com/v1/",
+        model: "claude-sonnet-4-20250514",
+      };
     case "openai_compatible":
       return {
         apiKey,

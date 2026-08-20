@@ -114,6 +114,32 @@ Use `--format json` for one JSON object on stdout, or `--format markdown` to pre
 ai --format json -- "What is 2 + 2?"
 ```
 
+### Responses API
+
+Chat Completions remains the default for OpenAI-compatible providers. Use `--responses` with providers that support OpenAI's Responses API:
+
+```bash
+ai --responses -- "Review this change"
+```
+
+`--responses` supports the same chat history, files, images, and built-in tools as Chat Completions. It cannot be combined with the legacy `--assistant` mode.
+
+### Anthropic Messages API
+
+Select `Anthropic` during `ai init`, or configure it directly:
+
+```yaml
+provider: anthropic
+providers:
+  anthropic:
+    type: anthropic
+    baseURL: https://api.anthropic.com/v1/
+    model: claude-sonnet-4-20250514
+    apiKey: your-anthropic-key
+```
+
+A provider with `type: anthropic` automatically uses the Messages API. `--anthropic` can also force the protocol for a compatible custom endpoint.
+
 ### Multiline Input
 
 To provide multiline input (or paste multiple lines input input) you can use the Actions Menu to select the 'Chat (Multiline)' action. Just press <code>Enter</code> at the prompt. Your `$EDITOR` will open:
@@ -277,17 +303,19 @@ ai -- "How do I install NodeJS?"
 
 The following parameters are available:
 
-| Parameter              | Description                                                             |
-|------------------------|-------------------------------------------------------------------------|
-| `-c, --copy`           | Copy response to the clipboard and exit.                                |
-| `-r, --raw`            | Do not format markdown or change the response in any way.               |
-| `-f, --file <path>`    | (Multiple allowed). Attach file to the chat.                            |
+| Parameter              | Description                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `-c, --copy`           | Copy response to the clipboard and exit.                                                                 |
+| `-r, --raw`            | Do not format markdown or change the response in any way.                                                |
+| `-f, --file <path>`    | (Multiple allowed). Attach file to the chat.                                                             |
 | `--assistant`          | ([Experimental](docs/experimental-features.md)). Use the Assistants API rather than the Completions API. |
-| `--no-context-prompts` | Disable context prompts (e.g. 'my shell is bash').                      |
-| `--no-output-prompts`  | Disable output prompts (e.g. 'show code only').                         |
-| `--no-project-context` | Do not load `.terminal-ai.md` from the working directory.               |
-| `--resume <name>`      | Resume and save a named conversation.                                   |
-| `--format <format>`    | Output format: `text`, `markdown`, or `json`.                           |
+| `--responses`          | Use the OpenAI Responses API rather than Chat Completions.                                               |
+| `--anthropic`          | Use the Anthropic Messages API.                                                                          |
+| `--no-context-prompts` | Disable context prompts (e.g. 'my shell is bash').                                                       |
+| `--no-output-prompts`  | Disable output prompts (e.g. 'show code only').                                                          |
+| `--no-project-context` | Do not load `.terminal-ai.md` from the working directory.                                                |
+| `--resume <name>`      | Resume and save a named conversation.                                                                    |
+| `--format <format>`    | Output format: `text`, `markdown`, or `json`.                                                            |
 
 **`ai init`**
 
@@ -384,9 +412,9 @@ Detailed in instructions for how to configure `ai` are in the [Configuration Doc
 If you want to run `ai` without interactively initialising first (for example, in a CI/CD environment or when using a GitHub action such as [`terminal-ai-action`](https://github.com/dwmkerr/terminal-ai-action)) you can create this configuration file yourself. If you can only specify an API key in your configuration, `ai` will assume you are using OpenAI. This means if you have an OpenAI key you can simply do this:
 
 ```yaml
-apiKey: <Your Key>                    # Required.
+apiKey: <Your Key> # Required.
 baseURL: "https://api.openai.com/v1/" # Optional.
-model: "gpt-3.5-turbo"                # Optional.
+model: "gpt-3.5-turbo" # Optional.
 ```
 
 Or you can set the `AI_API_KEY` environment variable:

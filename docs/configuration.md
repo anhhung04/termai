@@ -10,8 +10,8 @@ This guide explains how the configuration system works, how to configure differe
 <!-- vim-markdown-toc GFM -->
 
 - [Configuration Essentials](#configuration-essentials)
-    - [Basic LLM Configuration](#basic-llm-configuration)
-    - [Advanced LLM Configuration](#advanced-llm-configuration)
+  - [Basic LLM Configuration](#basic-llm-configuration)
+  - [Advanced LLM Configuration](#advanced-llm-configuration)
 - [Validating Configuration](#validating-configuration)
 - [Viewing Configuration](#viewing-configuration)
 - [The Configuration Specification](#the-configuration-specification)
@@ -23,7 +23,7 @@ This guide explains how the configuration system works, how to configure differe
 
 Terminal AI is configured with a configuration file at `~/.ai/config.yaml`.
 
-Almost all of the configuration settings can also be set by providing environment variables. 
+Almost all of the configuration settings can also be set by providing environment variables.
 
 There are three useful commands when working with configuration:
 
@@ -122,10 +122,10 @@ providers:
     baseURL: https://api.anthropic.com/v1
     model: claude-3-opus-20240229
     apiKey: anthropic-key
-    type: openai_compatible
+    type: anthropic
 ```
 
-A provider must include an `apiKey`, `baseURL` and `model`. Providers are assumed to be compatible with the OpenAI API specification by default.
+A provider must include an `apiKey`, `baseURL` and `model`. Providers use the OpenAI API by default; `type: anthropic` uses the Anthropic Messages API.
 
 If you specify a `type` then Terminal AI will use the database at [`ai-providers-and-models`](https://github.com/dwmkerr/ai-providers-and-models) to offer more helpful information when setting models and validating configuration.
 
@@ -159,7 +159,7 @@ To see the fully loaded configuration run `ai config`. This will show everything
 Each of the configuration values, the environment variables that can be used to update them, and their defaults are documented below.
 
 | Config File                   | Env. Var             | Default                      | Description                                                                                                     |
-|-------------------------------|----------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| ----------------------------- | -------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | **Basic Provider Config**     |                      |                              |                                                                                                                 |
 | `apiKey`                      | `AI_API_KEY`         | (None).                      | Required if `providers` not set. OpenAI compatible API key.                                                     |
 | `baseURL`                     | `AI_BASE_URL`        | `https://api.openai.com/v1/` | (Optional). The base URL for API calls.                                                                         |
@@ -200,37 +200,37 @@ providers:
     type: openai
     baseURL: https://api.openai.com/v1/
     model: gpt-4-0613
-    apiKey: '123'
+    apiKey: "123"
   gemini:
     name: gemini
     type: gemini_openai
     baseURL: https://generativelanguage.googleapis.com/v1beta/openai/
     model: models/gemini-2.0-flash
-    apiKey: '123'
+    apiKey: "123"
   claude:
     name: claude
     type: openai_compatible
     baseURL: https://api.anthropic.com/v1
     model: claude-3-opus-20240229
-    apiKey: '123'
+    apiKey: "123"
   msty:
     name: msty
     type: openai_compatible
     baseURL: http://localhost:10000/v1/
     model: gemma3:1b
-    apiKey: 'notused'
+    apiKey: "notused"
   ollama:
     name: ollama
     type: openai_compatible
     baseURL: http://localhost:11434/v1/
     model: gemma3:1b
-    apiKey: 'notused'
+    apiKey: "notused"
   litellm:
     name: litellm
     type: openai_compatible
     baseURL: http://localhost:4000/
     model: claude-3.7
-    apiKey: 'notused'
+    apiKey: "notused"
 ```
 
 Additional configuration options can be set for [Integrations](./integrations.md).

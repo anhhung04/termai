@@ -51,6 +51,14 @@ describe("translateError", () => {
     expect(translated.errorCode).toBe(ErrorCode.OpenAIRateLimitError);
   });
 
+  it("should translate provider connection timeouts", () => {
+    const err = new OpenAI.APIConnectionTimeoutError();
+    const translated = translateError(err);
+
+    expect(translated.errorCode).toBe(ErrorCode.Connection);
+    expect(translated.message).toMatch(/timed out/);
+  });
+
   it("should handle connection errors", () => {
     const err = "Connection error: network is down";
     const translated = translateError(err);

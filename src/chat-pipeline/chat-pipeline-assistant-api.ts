@@ -1,4 +1,3 @@
-import OpenAI from "openai";
 import dbg from "debug";
 import { parseInput } from "./stages/parse-input";
 import { createAssistant } from "./stages/create-assistant";
@@ -15,6 +14,7 @@ import { translateError } from "../lib/translate-error";
 import { getProviderPrompt } from "../providers/get-provider-prompt";
 import { loadAndAppendInputFiles } from "./stages/load-and-append-input-files";
 import { saveConversation } from "../conversations/conversations";
+import { createProviderClient } from "../providers/create-provider-client";
 import { convertChatCompletionToAssistantMessages } from "../lib/openai/openai-message";
 
 const debug = dbg("ai:chat-pipeline-assistant");
@@ -24,10 +24,7 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
   const { executionContext, chatContext } = parameters;
   const config = executionContext.config;
   const params = { ...parameters, config };
-  const openai = new OpenAI({
-    apiKey: parameters.executionContext.provider.apiKey,
-    baseURL: parameters.executionContext.provider.baseURL,
-  });
+  const openai = createProviderClient(parameters.executionContext.provider);
 
   //  Create the assistant and thread. We must also track how many of our chat
   //  context messages have been sent (as we only send new ones).

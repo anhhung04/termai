@@ -1,10 +1,14 @@
-import OpenAI from "openai";
 import { parseInput } from "./stages/parse-input";
 import { ChatPipelineParameters } from "./ChatPipelineParameters";
 import { initialInput } from "./stages/initial-input";
 import { buildContext } from "./stages/build-context";
 import { buildOutputIntentContext } from "./stages/build-output-intent-context";
-import { getCompletionsResponseWithTools } from "./stages/get-response";
+import {
+  getCompletionsResponseWithTools,
+  getResponsesResponseWithTools,
+  getChatToolsAndHandlers,
+} from "./stages/get-response";
+import { getAnthropicResponseWithTools } from "../providers/anthropic";
 import { copyResponse } from "./stages/copy-response";
 import { printResponse } from "./stages/print-response";
 import { nextInputOrAction } from "./stages/next-input-or-action";
@@ -12,16 +16,14 @@ import { parseResponse } from "./stages/parse-response";
 import { getProviderPrompt } from "../providers/get-provider-prompt";
 import { loadAndAppendInputFiles } from "./stages/load-and-append-input-files";
 import { saveConversation } from "../conversations/conversations";
+import { createProviderClient } from "../providers/create-provider-client";
 
 export async function executeChatPipeline(parameters: ChatPipelineParameters) {
   //  Ensure we have the required configuration.
   const { executionContext, chatContext } = parameters;
   const config = parameters.executionContext.config;
   const params = { ...parameters, config };
-  const openai = new OpenAI({
-    apiKey: parameters.executionContext.provider.apiKey,
-    baseURL: parameters.executionContext.provider.baseURL,
-  });
+  const openai = createProviderClient(parameters.executionContext.provider);
 
   //  Get all context prompts and add them to a new conversation.
   if (chatContext.messages.length === 0) {
@@ -65,11 +67,22 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
     });
 
     //  Get the response from the completion api.
-    const rawMarkdownResponse = await getCompletionsResponseWithTools(
-      params,
-      openai,
-      chatContext.messages,
-    );
+    const rawMarkdownResponse = params.options.anthropic
+      ? await (async () => {
+          const { tools, handlers } = getChatToolsAndHandlers(params);
+          return getAnthropicResponseWithTools(params, tools, handlers);
+        })()
+      : params.options.responses
+        ? await getResponsesResponseWithTools(
+            params,
+            openai,
+            chatContext.messages,
+          )
+        : await getCompletionsResponseWithTools(
+            params,
+            openai,
+            chatContext.messages,
+          );
     const response = parseResponse(prompt, rawMarkdownResponse);
     chatContext.messages.push({
       role: "assistant",

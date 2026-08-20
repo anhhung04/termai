@@ -16,6 +16,8 @@ export async function debugInput(executionContext: ExecutionContext) {
       enableOutputPrompts: false,
       copy: false,
       raw: false,
+      responses: false,
+      anthropic: false,
       format: "text",
       enableProjectContext: false,
     },

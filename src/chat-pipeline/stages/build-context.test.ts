@@ -11,6 +11,8 @@ describe("buildContext", () => {
       options: {
         copy: false,
         raw: false,
+        responses: false,
+        anthropic: false,
         format: "text",
         enableProjectContext: false,
         enableContextPrompts: true,
@@ -34,6 +36,8 @@ describe("buildContext", () => {
       options: {
         copy: false,
         raw: false,
+        responses: false,
+        anthropic: false,
         format: "text",
         enableProjectContext: false,
         enableContextPrompts: true,

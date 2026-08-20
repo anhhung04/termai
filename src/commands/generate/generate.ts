@@ -1,7 +1,7 @@
+import OpenAI from "openai";
 import os from "os";
 import { spawnSync } from "child_process";
 
-import OpenAI from "openai";
 import { confirm, input } from "@inquirer/prompts";
 import colors from "colors/safe";
 
@@ -38,6 +38,7 @@ import {
   executeFetchPageTool,
 } from "../../lib/tools/fetch-page-tool";
 import { isLocalProvider } from "../../providers/is-local-provider";
+import { createProviderClient } from "../../providers/create-provider-client";
 import {
   NETWORK_SCAN_TOOL,
   NetworkScanArgs,
@@ -167,10 +168,7 @@ Error handling:
 ${SHARED_PROMPT}`;
 
   //  Call the LLM to generate the command.
-  const openai = new OpenAI({
-    apiKey: executionContext.provider.apiKey,
-    baseURL: executionContext.provider.baseURL,
-  });
+  const openai = createProviderClient(executionContext.provider);
 
   const local = isLocalProvider(executionContext.provider);
   const generateTools = [

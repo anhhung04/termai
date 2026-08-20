@@ -15,6 +15,8 @@ export async function chat(
   enableOutputPrompts: boolean,
   copy: boolean,
   raw: boolean,
+  responses: boolean,
+  anthropic: boolean,
   format: "text" | "markdown" | "json",
   enableProjectContext: boolean,
   conversationName: string | undefined,
@@ -24,6 +26,14 @@ export async function chat(
 ) {
   if (!(["text", "markdown", "json"] as string[]).includes(format)) {
     throw new Error("format must be text, markdown, or json");
+  }
+
+  const useAnthropic =
+    anthropic || executionContext.provider.type === "anthropic";
+  if ([assistant, responses, useAnthropic].filter(Boolean).length > 1) {
+    throw new Error(
+      "--assistant, --responses, and --anthropic cannot be combined",
+    );
   }
 
   //  Ensure we are configured sufficiently.
@@ -49,6 +59,8 @@ export async function chat(
         enableOutputPrompts,
         copy,
         raw,
+        responses,
+        anthropic: useAnthropic,
         format,
         enableProjectContext,
         conversationName,
@@ -64,6 +76,8 @@ export async function chat(
         enableOutputPrompts,
         copy,
         raw,
+        responses,
+        anthropic: useAnthropic,
         format,
         enableProjectContext,
         conversationName,

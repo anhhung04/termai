@@ -57,6 +57,8 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
       [],
     )
     .option("--assistant", "Experimental. Use the OpenAI Assistants API")
+    .option("--responses", "Use the OpenAI Responses API")
+    .option("--anthropic", "Use the Anthropic Messages API")
     .option("--no-context-prompts", "Disable context prompts")
     .option("--no-output-prompts", "Disable output prompts")
     .argument("[input]", "Chat input")
@@ -69,6 +71,8 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
           outputPrompts,
           copy,
           raw,
+          responses,
+          anthropic,
           format,
           projectContext,
           resume,
@@ -84,6 +88,8 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
           outputPrompts,
           copy,
           raw,
+          responses,
+          anthropic,
           format,
           projectContext,
           resume,
@@ -106,6 +112,8 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
           undefined,
           true,
           true,
+          false,
+          false,
           false,
           false,
           "text",
@@ -163,16 +171,6 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
     .action(async () => {
       await check(executionContext);
     });
-
-  //  The usage command is still very much work in progress.
-  // if (executionContext.config.debug.enable) {
-  //   program
-  //     .command("usage")
-  //     .description("View API usage statistics")
-  //     .action(async () => {
-  //       await usage(executionContext);
-  //     });
-  // }
 
   program
     .command("debug")

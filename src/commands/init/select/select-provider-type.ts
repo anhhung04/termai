@@ -20,6 +20,11 @@ export async function selectProviderType(
         description: "Gemini (using OpenAI compatiblity)",
       },
       {
+        name: "Anthropic",
+        value: "anthropic",
+        description: "Anthropic Messages API",
+      },
+      {
         name: "OpenAI Compatible",
         value: "openai_compatible",
         description: "Any OpenAI Compatible Provider",

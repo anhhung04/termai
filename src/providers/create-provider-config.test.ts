@@ -25,6 +25,16 @@ describe("providers", () => {
       });
     });
 
+    it("creates correct anthropic config", () => {
+      expect(createProviderConfig("anthropic", "akey")).toStrictEqual({
+        apiKey: "akey",
+        type: "anthropic",
+        name: "anthropic",
+        baseURL: "https://api.anthropic.com/v1/",
+        model: "claude-sonnet-4-20250514",
+      });
+    });
+
     it("throws on unknown provider type", () => {
       expect(() =>
         createProviderConfig("whatever" as ProviderType, "key"),
