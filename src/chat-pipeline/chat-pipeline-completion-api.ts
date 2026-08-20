@@ -11,6 +11,7 @@ import { nextInputOrAction } from "./stages/next-input-or-action";
 import { parseResponse } from "./stages/parse-response";
 import { getProviderPrompt } from "../providers/get-provider-prompt";
 import { loadAndAppendInputFiles } from "./stages/load-and-append-input-files";
+import { saveConversation } from "../conversations/conversations";
 
 export async function executeChatPipeline(parameters: ChatPipelineParameters) {
   //  Ensure we have the required configuration.
@@ -23,10 +24,12 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
   });
 
   //  Get all context prompts and add them to a new conversation.
-  const contextPrompts = await buildContext(params, process.env);
-  chatContext.messages.push(
-    ...contextPrompts.map((c) => ({ role: c.role, content: c.context })),
-  );
+  if (chatContext.messages.length === 0) {
+    const contextPrompts = await buildContext(params, process.env);
+    chatContext.messages.push(
+      ...contextPrompts.map((c) => ({ role: c.role, content: c.context })),
+    );
+  }
 
   //  Determine our initial input. Might be from the command line params, user
   //  entry, stdin, etc...
@@ -68,6 +71,17 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
       chatContext.messages,
     );
     const response = parseResponse(prompt, rawMarkdownResponse);
+    chatContext.messages.push({
+      role: "assistant",
+      content: response.rawMarkdownResponse,
+    });
+    if (params.options.conversationName) {
+      saveConversation(
+        params.executionContext.configFilePath,
+        params.options.conversationName,
+        chatContext.messages,
+      );
+    }
 
     //  If the intent is to copy the response, copy it and we're done.
     if (await copyResponse(params, response)) {
@@ -85,12 +99,6 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
     ) {
       return;
     }
-
-    //  Add the response to the chat history.
-    chatContext.messages.push({
-      role: "assistant",
-      content: response.rawMarkdownResponse,
-    });
 
     //  We continue the conversation - asking for input or performing actions.
     //  This loop will end when the user hits Ctrl+C or performs an action

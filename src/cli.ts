@@ -35,6 +35,16 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
     .option("-c, --copy", "Copy output to clipboard and exit")
     .option("-r, --raw", "Do not format or highlight markdown output")
     .option(
+      "--format <format>",
+      "Output format: text, markdown, or json",
+      "text",
+    )
+    .option("--resume <name>", "Resume and update a named conversation")
+    .option(
+      "--no-project-context",
+      "Do not load .terminal-ai.md from the current directory",
+    )
+    .option(
       "-f, --file <path>",
       "Path to file(s) to send (multiple files allowed)",
       collect,
@@ -59,6 +69,9 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
           outputPrompts,
           copy,
           raw,
+          format,
+          projectContext,
+          resume,
           assistant,
           file,
           imageFile,
@@ -71,6 +84,9 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
           outputPrompts,
           copy,
           raw,
+          format,
+          projectContext,
+          resume,
           assistant,
           file,
           imageFile,
@@ -92,6 +108,9 @@ const cli = async (program: Command, executionContext: ExecutionContext) => {
           true,
           false,
           false,
+          "text",
+          true,
+          undefined,
           false,
           [],
           [],

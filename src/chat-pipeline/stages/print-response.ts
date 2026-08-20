@@ -7,9 +7,21 @@ export async function printResponse(
   response: ChatResponse,
   outputIntent: OutputIntent,
 ) {
-  //  If we are writing raw output, dump it now and we're done.
-  if (params.options.raw) {
+  if (params.options.format === "json") {
+    console.log(
+      JSON.stringify({
+        response: response.rawMarkdownResponse,
+        model: params.executionContext.provider.model,
+        provider: params.executionContext.provider.name,
+      }),
+    );
+    return;
+  }
+
+  //  If we are writing raw markdown, dump it now and we're done.
+  if (params.options.raw || params.options.format === "markdown") {
     console.log(response.rawMarkdownResponse);
+    return;
   }
 
   //  If our output intent is code, then we will write the code block only and

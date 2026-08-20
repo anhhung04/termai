@@ -93,6 +93,27 @@ If `ai` detects that you are using a TTY then it will prompt you to continue the
 ai -- "How can I programatically create a calendar invite?" > answer.txt
 ```
 
+### Project Instructions
+
+Place project-specific guidance in `.terminal-ai.md` in the working directory. Terminal AI adds it as a system prompt for new chats started there. Use `--no-project-context` to skip it for one run.
+
+### Resuming Conversations
+
+Use `--resume <name>` to persist a chat under `~/.ai/conversations/` and continue it later:
+
+```bash
+ai --resume release-notes "Summarize the changes so far"
+ai --resume release-notes "Now draft the announcement"
+```
+
+### Scriptable Output
+
+Use `--format json` for one JSON object on stdout, or `--format markdown` to preserve the model's markdown:
+
+```bash
+ai --format json -- "What is 2 + 2?"
+```
+
 ### Multiline Input
 
 To provide multiline input (or paste multiple lines input input) you can use the Actions Menu to select the 'Chat (Multiline)' action. Just press <code>Enter</code> at the prompt. Your `$EDITOR` will open:
@@ -264,6 +285,9 @@ The following parameters are available:
 | `--assistant`          | ([Experimental](docs/experimental-features.md)). Use the Assistants API rather than the Completions API. |
 | `--no-context-prompts` | Disable context prompts (e.g. 'my shell is bash').                      |
 | `--no-output-prompts`  | Disable output prompts (e.g. 'show code only').                         |
+| `--no-project-context` | Do not load `.terminal-ai.md` from the working directory.               |
+| `--resume <name>`      | Resume and save a named conversation.                                   |
+| `--format <format>`    | Output format: `text`, `markdown`, or `json`.                           |
 
 **`ai init`**
 

@@ -14,6 +14,7 @@ import { parseResponse } from "./stages/parse-response";
 import { translateError } from "../lib/translate-error";
 import { getProviderPrompt } from "../providers/get-provider-prompt";
 import { loadAndAppendInputFiles } from "./stages/load-and-append-input-files";
+import { saveConversation } from "../conversations/conversations";
 import { convertChatCompletionToAssistantMessages } from "../lib/openai/openai-message";
 
 const debug = dbg("ai:chat-pipeline-assistant");
@@ -35,11 +36,13 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
     const thread = await openai.beta.threads.create();
     let currentMessageIndex = 0; // how many of our chat context messages sent.
 
-    //  Get all context prompts and add them to a new conversation.
-    const contextPrompts = await buildContext(params, process.env);
-    chatContext.messages.push(
-      ...contextPrompts.map((c) => ({ role: c.role, content: c.context })),
-    );
+    //  New conversations start with configured and project context.
+    if (chatContext.messages.length === 0) {
+      const contextPrompts = await buildContext(params, process.env);
+      chatContext.messages.push(
+        ...contextPrompts.map((c) => ({ role: c.role, content: c.context })),
+      );
+    }
 
     //  Determine our initial input. Might be from the command line params, user
     //  entry, stdin, etc...
@@ -85,6 +88,17 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
       const { response: rawMarkdownResponse, messages } =
         await getAssistantResponse(params, openai, assistant.id, thread.id);
       const response = parseResponse(prompt, rawMarkdownResponse);
+      chatContext.messages.push({
+        role: "assistant",
+        content: response.rawMarkdownResponse,
+      });
+      if (params.options.conversationName) {
+        saveConversation(
+          params.executionContext.configFilePath,
+          params.options.conversationName,
+          chatContext.messages,
+        );
+      }
 
       //  If the intent is to copy the response, copy it and we're done.
       if (await copyResponse(params, response)) {
@@ -103,13 +117,8 @@ export async function executeChatPipeline(parameters: ChatPipelineParameters) {
         return;
       }
 
-      //  Note that we do not need to add the response to the thread - openai
-      //  handles this for us. But we do need to add the response to the chat
-      //  history. Update our conversation messages position.
-      chatContext.messages.push({
-        role: "assistant",
-        content: response.rawMarkdownResponse,
-      });
+      //  The assistant response is already in the remote thread. Track that
+      //  every local message has now been sent before reading the next input.
       currentMessageIndex = chatContext.messages.length;
 
       //  We continue the conversation - asking for input or performing actions.

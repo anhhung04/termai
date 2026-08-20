@@ -6,6 +6,7 @@ import {
   ChatContext,
   initialChatContext,
 } from "../../chat-pipeline/ChatContext";
+import { loadConversation } from "../../conversations/conversations";
 
 export async function chat(
   executionContext: ExecutionContext,
@@ -14,16 +15,26 @@ export async function chat(
   enableOutputPrompts: boolean,
   copy: boolean,
   raw: boolean,
+  format: "text" | "markdown" | "json",
+  enableProjectContext: boolean,
+  conversationName: string | undefined,
   assistant: boolean,
   files: string[],
   imageFiles: string[],
 ) {
+  if (!(["text", "markdown", "json"] as string[]).includes(format)) {
+    throw new Error("format must be text, markdown, or json");
+  }
+
   //  Ensure we are configured sufficiently.
   await ensureApiKey(executionContext);
 
   //  A clean initial chat context.
   const chatContext: ChatContext = {
     ...initialChatContext(),
+    messages: conversationName
+      ? loadConversation(executionContext.configFilePath, conversationName)
+      : [],
     filePathsOutbox: files,
     imageFilePathsOutbox: imageFiles,
   };
@@ -38,6 +49,9 @@ export async function chat(
         enableOutputPrompts,
         copy,
         raw,
+        format,
+        enableProjectContext,
+        conversationName,
       },
     });
   } else {
@@ -50,6 +64,9 @@ export async function chat(
         enableOutputPrompts,
         copy,
         raw,
+        format,
+        enableProjectContext,
+        conversationName,
       },
     });
   }

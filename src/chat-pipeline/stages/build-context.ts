@@ -1,6 +1,7 @@
 import dbg from "debug";
 import { expandContext, ExpandedContext } from "../../context/context";
 import { ChatPipelineParameters } from "../ChatPipelineParameters";
+import { readProjectInstructions } from "./project-instructions";
 
 const debug = dbg("ai:context");
 
@@ -15,6 +16,13 @@ export async function buildContext(
       )
     : [];
 
-  debug(`expanded context: ${context.map((c) => c.context).join("\n")}`);
-  return context;
+  const projectInstructions = params.options.enableProjectContext
+    ? readProjectInstructions()
+    : undefined;
+  const expanded = projectInstructions
+    ? [...context, projectInstructions]
+    : context;
+
+  debug(`expanded context: ${expanded.map((c) => c.context).join("\n")}`);
+  return expanded;
 }

@@ -32,15 +32,14 @@ export function printHint(hint: string, interactive: boolean) {
   return interactive ? colors.gray(hint) : hint;
 }
 
-export async function startSpinner(_: boolean, text: string = "") {
-  // We might not need to override whether it is interactive?
-  // if (!interactive) {
-  //   return {
-  //     stop: () => undefined,
-  //     succeed: () => undefined,
-  //     fail: () => undefined,
-  //   };
-  // }
+export async function startSpinner(interactive: boolean, text: string = "") {
+  if (!interactive) {
+    return {
+      stop: () => undefined,
+      succeed: () => undefined,
+      fail: () => undefined,
+    };
+  }
   const ora = (await import("ora")).default;
   return ora(text).start();
 }

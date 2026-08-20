@@ -16,6 +16,8 @@ export async function debugInput(executionContext: ExecutionContext) {
       enableOutputPrompts: false,
       copy: false,
       raw: false,
+      format: "text",
+      enableProjectContext: false,
     },
   };
   const chatInputPrompt = theme.inputPrompt("chat");

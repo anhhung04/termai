@@ -10,5 +10,8 @@ export type ChatPipelineParameters = {
     enableOutputPrompts: boolean;
     copy: boolean;
     raw: boolean;
+    format: "text" | "markdown" | "json";
+    enableProjectContext: boolean;
+    conversationName?: string;
   };
 };
