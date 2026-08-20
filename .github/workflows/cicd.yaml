@@ -1,0 +1,198 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# Release Please needs permisisons to write commits and open PRs.
+# Required to publish NPM package to GH NPM.
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+
+# We will build and test across a number of Node.js versions. Some steps only
+# occur for a single Node version (such as uploading coverage) - this variable
+# defines which Node version to use for these steps (which should be the current
+# Node Long-Term Support version).
+env:
+  NODE_LTS_VERSION: 22.x
+
+jobs:
+  validate:
+    name: Validate
+
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        node-version:
+          - 16.x
+          - 18.x
+          - 20.x
+          - 22.x
+
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup the right version of Node.js.
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+
+      # Install dependencies.
+      - name: install
+        run: npm install
+
+      # Lint the code.
+      - name: lint
+        run: npm run lint
+
+      # Build TypeScript.
+      - name: build
+        run: npm run build
+
+      # Run all tests, including coverage.
+      - name: test
+        run: npm run test:cov
+
+      # Validate that we can install wiht 'npm install' and then run 'ai'.
+      - name: validate install
+        run: ./tests/test-install.sh
+        env:
+          TESTING_AI_API_KEY: ${{ secrets.TESTING_AI_API_KEY }}
+
+      # Upload the artifacts folder.
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            ./artifacts/
+        # Only upload artifacts for the build on the LTS version (we don't
+        # need artifacts per node version).
+        if: ${{ matrix.node-version == env.NODE_LTS_VERSION }}
+
+
+  upload-coverage:
+    name: Upload Coverage
+
+    # The 'upload coverage' job will only run if successfully complete the
+    # 'validate' job.
+    needs: validate
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      # The source files must be present for codecov to be upload the file list
+      # properly, otherwise no coverage is reported and the "unusable report"
+      # error is shown. Took ages to work this out.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Download the build artifacts.
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./artifacts
+
+      # Upload coverage.
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v5
+        with:
+          directory: ./artifacts/coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  test-e2e:
+    name: E2E Tests
+    needs: validate
+    runs-on: ubuntu-24.04
+
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup the right version of Node.js.
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_LTS_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      # Install dependencies, build, install.
+      - name: install
+        run: |
+          npm install
+          npm run build
+          npm install -g .
+
+      # Validate that we can install wiht 'npm install' and then run 'ai'.
+      - name: test-e2e
+        run: make test-e2e
+        env:
+          TESTING_AI_API_KEY: ${{ secrets.TESTING_AI_API_KEY }}
+
+  release-please:
+    name: Release PR/Deploy
+    runs-on: ubuntu-24.04
+
+    # The 'release please' job will only run if successfully complete the
+    # 'e2e tests' job. The deployment steps only occur if this is a release
+    # merge.
+    needs: test-e2e
+
+    steps:
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+      
+      - name: Checkout
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+
+      # Setup the right version of Node.js.
+      - name: Setup Node ${{ matrix.node-version }}
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_LTS_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      # Build the distributable code.
+      - name: Build Distributable
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          npm install
+          npm run build
+
+      # Publish the module to NPM.
+      - name: Publish to NPM
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          # The 'npm publish' command will only run if an NPM_TOKEN secret is
+          # set. If it is not set, warn the user.
+          if [ "$NODE_AUTH_TOKEN" == "" ]; then
+            echo "The 'NPM_TOKEN' secret must be set to deploy to NPM"
+            exit 1
+          else
+            echo "The 'NPM_TOKEN' secret has been set - deploying to NPM..."
+            npm publish --access=public
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+      # Publish the module to GitHub packages.
+      - name: Publish to GitHub Packages
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          npm set //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}
+          npm publish --registry https://npm.pkg.github.com

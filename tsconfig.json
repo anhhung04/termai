@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "dist",
+    "target": "ES2015",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "useUnknownInCatchVariables": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "types": ["jest", "marked-terminal"]
+  },
+  "exclude": ["jest.config.ts"]
+}
