@@ -2,6 +2,7 @@ import {
   Configuration,
   ProviderConfiguration,
 } from "../configuration/configuration";
+import { ResolvedProvider } from "../providers/resolve-provider";
 import { LangfuseIntegrationContext } from "../integrations/langfuse";
 
 /**
@@ -27,6 +28,10 @@ export type ExecutionContext = {
 
   //  Our current provider.
   provider: ProviderConfiguration;
+
+  //  The provider with runtime-only data resolved (api key, headers, CLI
+  //  executable). Never persisted.
+  resolvedProvider?: ResolvedProvider;
 
   //  Are we on a first run, e.g. init-ing key etc?
   isFirstRun: boolean;

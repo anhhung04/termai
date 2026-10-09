@@ -19,7 +19,7 @@ describe("configuration", () => {
     });
 
     afterEach(() => {
-      fs.rmdirSync(tempTestFolder, { recursive: true });
+      fs.rmSync(tempTestFolder, { recursive: true, force: true });
     });
 
     it("fails with an Invalid Operation Error if the path is invalid", () => {
@@ -32,7 +32,7 @@ describe("configuration", () => {
 
     test("creates and updates config file and parent folder if it doesn't exist", () => {
       //  Delete the config folder first, assert it's gone...
-      fs.rmdirSync(tempTestFolder, { recursive: true });
+      fs.rmSync(tempTestFolder, { recursive: true, force: true });
       expect(fs.existsSync(tempTestFolder)).toBe(false);
       expect(fs.existsSync(tempConfigFilePath)).toBe(false);
 

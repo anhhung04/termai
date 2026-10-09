@@ -39,7 +39,7 @@ describe("execution-context", () => {
   });
 
   afterEach(() => {
-    fs.rmdirSync(tempTestFolder, { recursive: true });
+    fs.rmSync(tempTestFolder, { recursive: true, force: true });
   });
 
   describe("createExecutionContext", () => {
@@ -74,6 +74,17 @@ describe("execution-context", () => {
           model: "gpt-3.5-turbo",
           name: "",
           type: "openai",
+        },
+        resolvedProvider: {
+          apiKey: undefined,
+          headers: {},
+          provider: {
+            apiKey: "",
+            baseURL: "https://api.openai.com/v1/",
+            model: "gpt-3.5-turbo",
+            name: "",
+            type: "openai",
+          },
         },
         isFirstRun: true,
         isTTYstdin: true,
