@@ -65,9 +65,7 @@ export function credentialCommandEnvironment(
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === "object" && value !== null && !Array.isArray(value)
-  );
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function hasOnlyKeys(
@@ -103,7 +101,10 @@ export function isCredentialReference(
     );
   }
 
-  if (typeof value["provider"] === "string" && typeof value["name"] === "string") {
+  if (
+    typeof value["provider"] === "string" &&
+    typeof value["name"] === "string"
+  ) {
     return hasOnlyKeys(value, ["provider", "name"]);
   }
 
@@ -192,14 +193,18 @@ export async function resolveCredentialReference(
     let stdout: string;
     try {
       //  argv-based execution only: no shell, fixed argument vector.
-      const result = await execFileAsync(reference.command, reference.args || [], {
-        shell: false,
-        timeout: reference.timeoutMs || DEFAULT_COMMAND_TIMEOUT_MS,
-        maxBuffer: MAX_COMMAND_OUTPUT_BYTES,
-        windowsHide: true,
-        cwd: os.homedir(),
-        env: credentialCommandEnvironment(env),
-      });
+      const result = await execFileAsync(
+        reference.command,
+        reference.args || [],
+        {
+          shell: false,
+          timeout: reference.timeoutMs || DEFAULT_COMMAND_TIMEOUT_MS,
+          maxBuffer: MAX_COMMAND_OUTPUT_BYTES,
+          windowsHide: true,
+          cwd: os.homedir(),
+          env: credentialCommandEnvironment(env),
+        },
+      );
       stdout = result.stdout;
     } catch (err) {
       //  Never retain or surface the child error: it may embed stdout/stderr
@@ -259,7 +264,8 @@ export async function resolveCredential(
   return resolveCredentialReference(value);
 }
 
-const SENSITIVE_KEY = /(api.?key|secret|password|token|authorization|credential)/i;
+const SENSITIVE_KEY =
+  /(api.?key|secret|password|token|authorization|credential)/i;
 
 export function redactSecrets(value: unknown, key?: string): unknown {
   if (SENSITIVE_KEY.test(key || "")) {

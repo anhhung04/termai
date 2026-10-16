@@ -3,7 +3,10 @@ import {
   ProviderConfiguration,
 } from "../configuration/configuration";
 import { ErrorCode, TerminalAIError } from "../lib/errors";
-import { ResolvedProvider, resolveProvider } from "../providers/resolve-provider";
+import {
+  ResolvedProvider,
+  resolveProvider,
+} from "../providers/resolve-provider";
 
 export function buildProviderFromConfig(
   config: Configuration,

@@ -41,7 +41,11 @@ export async function resolveProvider(
   for (const headerName of Object.keys(provider.headers || {})) {
     const headerValue = (provider.headers || {})[headerName];
     headers[headerName] = isCredentialReference(headerValue)
-      ? await resolveCredentialReference(headerValue, env, options.providerLookup)
+      ? await resolveCredentialReference(
+          headerValue,
+          env,
+          options.providerLookup,
+        )
       : headerValue;
   }
 
@@ -87,10 +91,15 @@ async function resolveApiKey(
       `provider '${provider.name}'.apiKey must be a string or credential reference`,
     );
   }
-  validateCredentialReference(provider.apiKey as CredentialReference, `${provider.name}.apiKey`);
+  validateCredentialReference(
+    provider.apiKey as CredentialReference,
+    `${provider.name}.apiKey`,
+  );
   return resolveCredentialReference(provider.apiKey, env, providerLookup);
 }
 
-export function providerRequiresApiKey(provider: ProviderConfiguration): boolean {
+export function providerRequiresApiKey(
+  provider: ProviderConfiguration,
+): boolean {
   return provider.type !== "cli";
 }

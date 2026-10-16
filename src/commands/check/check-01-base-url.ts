@@ -28,10 +28,10 @@ export async function checkBaseURL(interactive: boolean, baseURL: string) {
     spinner.stop();
     const error = translateError(err);
     if (error.errorCode === ErrorCode.Connection) {
-      (spinner.fail(
+      spinner.fail(
         `Check Base URL Failed: your Base URL hostname '${hostname}' appears to be invalid, try 'ai init'`,
-      ),
-        process.exit(error.errorCode));
+      );
+      process.exit(error.errorCode);
     } else if (error.errorCode === ErrorCode.InvalidConfiguration) {
       spinner.fail(
         `Check Base URL Failed: your Base URL '${baseURL}' appears to be invalid, try 'ai init'`,

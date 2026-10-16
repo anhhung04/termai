@@ -35,7 +35,9 @@ const DEFAULT_MAX_OUTPUT_BYTES = 10 * 1024 * 1024;
  * - non-zero exit, spawn failure, timeout and abort map to typed errors whose
  *   messages never include argv, environment, stdout or stderr contents.
  */
-export function runCliAdapter(request: CliAdapterRequest): Promise<CliAdapterResult> {
+export function runCliAdapter(
+  request: CliAdapterRequest,
+): Promise<CliAdapterResult> {
   const maxOutputBytes = request.maxOutputBytes || DEFAULT_MAX_OUTPUT_BYTES;
   const label = request.executable;
 

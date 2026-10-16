@@ -19,7 +19,8 @@ export async function check(executionContext: ExecutionContext) {
   await checkOpenAIKey(
     interactive,
     openai,
-    executionContext.resolvedProvider?.apiKey ?? (typeof provider.apiKey === "string" ? provider.apiKey : ""),
+    executionContext.resolvedProvider?.apiKey ??
+      (typeof provider.apiKey === "string" ? provider.apiKey : ""),
   );
   await checkOpenAIModel(interactive, openai, provider.model);
   await checkOpenAIRateLimit(interactive, openai, provider.model);

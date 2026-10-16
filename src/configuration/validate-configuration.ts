@@ -43,15 +43,18 @@ export function validateConfiguration(config: Configuration) {
   //  Validate the langfuse credential references, if present.
   const langfuse = config.integrations?.langfuse;
   if (langfuse) {
-    validateOptionalSecret(langfuse.secretKey, "integrations.langfuse.secretKey");
-    validateOptionalSecret(langfuse.publicKey, "integrations.langfuse.publicKey");
+    validateOptionalSecret(
+      langfuse.secretKey,
+      "integrations.langfuse.secretKey",
+    );
+    validateOptionalSecret(
+      langfuse.publicKey,
+      "integrations.langfuse.publicKey",
+    );
   }
 }
 
-function validateOptionalSecret(
-  value: unknown,
-  fieldName: string,
-): void {
+function validateOptionalSecret(value: unknown, fieldName: string): void {
   if (value === undefined || value === "") return;
   if (typeof value === "string") return;
   validateCredentialReference(value, fieldName);
@@ -105,7 +108,10 @@ function validateProviderFields(
   }
 
   if (provider.headers !== undefined) {
-    if (typeof provider.headers !== "object" || Array.isArray(provider.headers)) {
+    if (
+      typeof provider.headers !== "object" ||
+      Array.isArray(provider.headers)
+    ) {
       throw new TerminalAIError(
         ErrorCode.InvalidConfiguration,
         `${fieldName}.headers must be a mapping of header name to value`,
@@ -121,7 +127,10 @@ function validateProviderFields(
       const headerValue = provider.headers[headerName];
       if (typeof headerValue === "string") continue;
       if (isCredentialReference(headerValue)) {
-        validateCredentialReference(headerValue, `${fieldName}.headers['${headerName}']`);
+        validateCredentialReference(
+          headerValue,
+          `${fieldName}.headers['${headerName}']`,
+        );
         continue;
       }
       throw new TerminalAIError(
@@ -131,7 +140,10 @@ function validateProviderFields(
     }
   }
 
-  if (provider.authHeader !== undefined && !/^[A-Za-z0-9-]+$/.test(provider.authHeader)) {
+  if (
+    provider.authHeader !== undefined &&
+    !/^[A-Za-z0-9-]+$/.test(provider.authHeader)
+  ) {
     throw new TerminalAIError(
       ErrorCode.InvalidConfiguration,
       `${fieldName}.authHeader is not a valid HTTP header name`,

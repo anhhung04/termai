@@ -7,7 +7,9 @@ import { ResolvedProvider } from "./resolve-provider";
 
 export const PROVIDER_MAX_RETRIES = 4;
 
-export function createProviderClient(provider: ProviderConfiguration | ResolvedProvider): OpenAI {
+export function createProviderClient(
+  provider: ProviderConfiguration | ResolvedProvider,
+): OpenAI {
   const resolved = toResolvedProvider(provider);
 
   if (resolved.provider.type === "cli") {
@@ -19,7 +21,10 @@ export function createProviderClient(provider: ProviderConfiguration | ResolvedP
 
   //  A credential reference must be resolved before a client is created, and
   //  only the runtime-resolved provider carries the resolved value.
-  if (isCredentialReference(resolved.provider.apiKey) && resolved.apiKey === undefined) {
+  if (
+    isCredentialReference(resolved.provider.apiKey) &&
+    resolved.apiKey === undefined
+  ) {
     throw new TerminalAIError(
       ErrorCode.InvalidConfiguration,
       `provider '${resolved.provider.name}' uses an unresolved credential reference - use the runtime-resolved provider`,
@@ -40,7 +45,9 @@ export function createProviderClient(provider: ProviderConfiguration | ResolvedP
     }
     if (value) {
       headers[authHeader] =
-        authHeader.toLowerCase() === "authorization" ? `Bearer ${value}` : value;
+        authHeader.toLowerCase() === "authorization"
+          ? `Bearer ${value}`
+          : value;
     }
   }
 

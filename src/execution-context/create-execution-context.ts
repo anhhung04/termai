@@ -4,7 +4,10 @@ import { hydrateContextEnvironmentVariables } from "../lib/hydrate-context-envir
 import { integrateLangfuse } from "../integrations/langfuse";
 import { loadConfiguration } from "../configuration/load-configuration";
 import { isFirstRun } from "./is-first-run";
-import { buildProviderFromConfig, buildResolvedProviderFromConfig } from "./build-provider";
+import {
+  buildProviderFromConfig,
+  buildResolvedProviderFromConfig,
+} from "./build-provider";
 
 const dbg = debug("ai:create-execution-context");
 

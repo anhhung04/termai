@@ -1,9 +1,5 @@
 export type ProviderType =
-  | "openai"
-  | "gemini_openai"
-  | "openai_compatible"
-  | "anthropic"
-  | "cli";
+  "openai" | "gemini_openai" | "openai_compatible" | "anthropic" | "cli";
 
 //  Types whose execution is delegated to a locally installed AI CLI binary
 //  rather than an HTTP API.
