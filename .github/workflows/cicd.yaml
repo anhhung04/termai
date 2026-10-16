@@ -27,9 +27,11 @@ jobs:
     runs-on: ubuntu-24.04
 
     strategy:
+      # Do not cancel the other Node versions when one leg fails; we want the
+      # full compatibility picture from a single run.
+      fail-fast: false
       matrix:
         node-version:
-          - 16.x
           - 18.x
           - 20.x
           - 22.x
