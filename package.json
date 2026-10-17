@@ -18,10 +18,10 @@
     "start:debug": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-vm-modules' node --inspect-brk node_modules/.bin/ts-node ./src/cli.ts",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-coverage",
+    "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings --max-old-space-size=2048' jest --no-coverage",
     "test:debug": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' node --inspect-brk node_modules/.bin/jest --runInBand --no-coverage",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --watch --no-coverage",
-    "test:cov": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --coverage",
+    "test:cov": "NODE_OPTIONS='--experimental-vm-modules --no-warnings --max-old-space-size=2048' jest --coverage",
     "tsc": "tsc",
     "relink": "npm run build && npm unlink ai && npm link ai"
   },
