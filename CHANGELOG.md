@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0 (2026-10-17)
+
+
+### Features
+
+* add durable multi-provider APIs ([56bf635](https://github.com/anhhung04/termai/commit/56bf635609e11514caf899d8387cc4f84092fd5b))
+* add resumable chats and scriptable output ([29605c3](https://github.com/anhhung04/termai/commit/29605c31c88842c81aca5edff3c42f427527504f))
+* detached terminal-ai fork ([d3a5570](https://github.com/anhhung04/termai/commit/d3a55707483b8c127df735a9cfcb20f502a329ce))
+
 ## [0.15.0](https://github.com/dwmkerr/terminal-ai/compare/v0.14.0...v0.15.0) (2025-06-12)
 
 
