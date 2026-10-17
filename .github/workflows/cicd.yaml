@@ -135,10 +135,17 @@ jobs:
           npm install -g .
 
       # Validate that we can install wiht 'npm install' and then run 'ai'.
+      # Requires a live API key; skip cleanly when the secret is absent rather
+      # than failing the pipeline with an auth error.
       - name: test-e2e
+        if: ${{ secrets.TESTING_AI_API_KEY != '' }}
         run: make test-e2e
         env:
           TESTING_AI_API_KEY: ${{ secrets.TESTING_AI_API_KEY }}
+
+      - name: test-e2e (skipped)
+        if: ${{ secrets.TESTING_AI_API_KEY == '' }}
+        run: echo "::notice::TESTING_AI_API_KEY not configured; skipping E2E tests."
 
   release-please:
     name: Release PR/Deploy
