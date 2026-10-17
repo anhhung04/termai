@@ -42,7 +42,7 @@ describe("configuration", () => {
     });
 
     afterEach(() => {
-      fs.rmdirSync(tempTestFolder, { recursive: true });
+      fs.rmSync(tempTestFolder, { recursive: true, force: true });
     });
 
     test("correctly enriches default configuration with file, prompts and env", async () => {
@@ -131,7 +131,7 @@ prompts:
     it("correctly overrides the root provider with AI_API_KEY, AI_BASE_URL and AI_MODEL and does not assume first run", async () => {
       const env = {
         AI_API_KEY: "overrideKey",
-        AI_BASE_URL: "overrideBaseURL",
+        AI_BASE_URL: "https://override.example.com/v1",
         AI_MODEL: "overrideModel",
       };
 
@@ -147,7 +147,7 @@ prompts:
         //  As expected, our config has been overridden.
         ...getDefaultConfiguration(),
         apiKey: "overrideKey",
-        baseURL: "overrideBaseURL",
+        baseURL: "https://override.example.com/v1",
         model: "overrideModel",
       });
     });
@@ -155,7 +155,7 @@ prompts:
     it("correctly overrides the configured named provider with AI_API_KEY, AI_BASE_URL and AI_MODEL and does not assume first run", async () => {
       const env = {
         AI_API_KEY: "overrideKey",
-        AI_BASE_URL: "overrideBaseURL",
+        AI_BASE_URL: "https://override.example.com/v1",
         AI_MODEL: "overrideModel",
       };
 
@@ -173,7 +173,7 @@ providers:
   openai:
     type: "openai"
     apiKey: "oapi"
-    baseURL: "ourl"
+    baseURL: "https://openai.example.com/v1"
     model: "omodel"`,
       );
 
@@ -189,7 +189,7 @@ providers:
         ...getDefaultConfiguration(),
         //  Root has been overridden...
         apiKey: "overrideKey",
-        baseURL: "overrideBaseURL",
+        baseURL: "https://override.example.com/v1",
         model: "overrideModel",
         //  Named provider has been overriden.
         provider: "gemini",
@@ -198,14 +198,14 @@ providers:
             name: "gemini",
             type: "gemini_openai",
             apiKey: "overrideKey",
-            baseURL: "overrideBaseURL",
+            baseURL: "https://override.example.com/v1",
             model: "overrideModel",
           },
           openai: {
             name: "openai",
             type: "openai",
             apiKey: "oapi",
-            baseURL: "ourl",
+            baseURL: "https://openai.example.com/v1",
             model: "omodel",
           },
         },

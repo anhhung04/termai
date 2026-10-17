@@ -105,7 +105,9 @@ export async function getAnthropicResponseWithTools(
     ).toString();
     const headers = {
       "content-type": "application/json",
-      "x-api-key": params.executionContext.provider.apiKey,
+      "x-api-key":
+        params.executionContext.resolvedProvider?.apiKey ??
+        String(params.executionContext.provider.apiKey),
       "anthropic-version": ANTHROPIC_VERSION,
     };
 

@@ -41,7 +41,7 @@ describe("configuration", () => {
     });
 
     afterEach(() => {
-      fs.rmdirSync(tempConfigFolder, { recursive: true });
+      fs.rmSync(tempConfigFolder, { recursive: true, force: true });
     });
 
     test("can hydrate prompts folder", () => {

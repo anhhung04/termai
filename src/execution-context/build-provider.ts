@@ -3,6 +3,10 @@ import {
   ProviderConfiguration,
 } from "../configuration/configuration";
 import { ErrorCode, TerminalAIError } from "../lib/errors";
+import {
+  ResolvedProvider,
+  resolveProvider,
+} from "../providers/resolve-provider";
 
 export function buildProviderFromConfig(
   config: Configuration,
@@ -31,4 +35,15 @@ export function buildProviderFromConfig(
     model: config.model,
     type: "openai", // root providers are assumed to be openai
   };
+}
+
+/**
+ * Build the provider and resolve all runtime-only data (credential
+ * references, headers, CLI executable). Consumers receive resolved values;
+ * the underlying configuration keeps only references.
+ */
+export async function buildResolvedProviderFromConfig(
+  config: Configuration,
+): Promise<ResolvedProvider> {
+  return await resolveProvider(buildProviderFromConfig(config));
 }

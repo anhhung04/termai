@@ -4,7 +4,10 @@ import { hydrateContextEnvironmentVariables } from "../lib/hydrate-context-envir
 import { integrateLangfuse } from "../integrations/langfuse";
 import { loadConfiguration } from "../configuration/load-configuration";
 import { isFirstRun } from "./is-first-run";
-import { buildProviderFromConfig } from "./build-provider";
+import {
+  buildProviderFromConfig,
+  buildResolvedProviderFromConfig,
+} from "./build-provider";
 
 const dbg = debug("ai:create-execution-context");
 
@@ -33,15 +36,19 @@ export async function createExecutionContext(
     dbg(`initialisiing and hydrating config...`);
   }
 
-  //  Create the execution context.
+  //  Build the provider definition from the config, then resolve all
+  //  runtime-only data (credentials, headers, CLI executable). The resolved
+  //  object is never written back to config.
   const provider = buildProviderFromConfig(config);
+  const resolvedProvider = await buildResolvedProviderFromConfig(config);
   const executionContext: ExecutionContext = {
     process,
-    //  We've got the config file and it's path...
+    //  We've got the config file and its path...
     configFilePath,
     config,
     //  ...the provider, which is a function of the config...
     provider: provider,
+    resolvedProvider,
     //  ...the first run, which is a function of the provider...
     isFirstRun: isFirstRun(provider),
     //  ...and state from the stdin/stdout streams.
@@ -51,7 +58,7 @@ export async function createExecutionContext(
 
   //  Enable any integrations.
   executionContext.integrations = {
-    langfuse: integrateLangfuse(executionContext.config),
+    langfuse: await integrateLangfuse(executionContext.config),
   };
 
   return executionContext;

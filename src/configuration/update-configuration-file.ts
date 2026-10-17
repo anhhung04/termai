@@ -4,6 +4,7 @@ import debug from "debug";
 import yaml from "js-yaml";
 import { ErrorCode, TerminalAIError } from "../lib/errors";
 import { enrichProperty } from "./enrich-configuration";
+import { sanitizeConfigurationForPersistence } from "./credentials";
 
 const dbg = debug("ai:configuration");
 
@@ -29,7 +30,13 @@ export function updateConfigurationFile(
     const yamlData = (yaml.load(fileContents) as Record<string, any>) || {};
     const fieldPaths = Object.keys(updates);
     for (const fieldPath of fieldPaths) {
-      enrichProperty(yamlData, fieldPath, updates[fieldPath]);
+      //  Never persist a plaintext secret: credential references are kept as
+      //  mappings, plaintext secret fields are dropped instead of written.
+      enrichProperty(
+        yamlData,
+        fieldPath,
+        sanitizeConfigurationForPersistence(updates[fieldPath]),
+      );
     }
     const updatedYaml = yaml.dump(yamlData, { indent: 2 });
     fs.writeFileSync(configFilePath, updatedYaml, "utf8");

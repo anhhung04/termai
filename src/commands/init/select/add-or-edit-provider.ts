@@ -16,7 +16,9 @@ export async function addOrEditProvider(provider?: ProviderConfiguration) {
   const providerType = await selectProviderType(provider?.type || "openai");
 
   //  Pick the API key.
-  const apiKey = await inputApiKey(provider?.apiKey);
+  const apiKey = await inputApiKey(
+    typeof provider?.apiKey === "string" ? provider.apiKey : undefined,
+  );
 
   //  The provider we've chosen might have a base url. We use the editing
   //  provider's base url if it exists, and the default from the provider

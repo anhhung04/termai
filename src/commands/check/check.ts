@@ -16,7 +16,12 @@ export async function check(executionContext: ExecutionContext) {
 
   await checkConnection(interactive);
   await checkBaseURL(interactive, provider.baseURL);
-  await checkOpenAIKey(interactive, openai, provider.apiKey);
+  await checkOpenAIKey(
+    interactive,
+    openai,
+    executionContext.resolvedProvider?.apiKey ??
+      (typeof provider.apiKey === "string" ? provider.apiKey : ""),
+  );
   await checkOpenAIModel(interactive, openai, provider.model);
   await checkOpenAIRateLimit(interactive, openai, provider.model);
 

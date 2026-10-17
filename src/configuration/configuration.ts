@@ -1,4 +1,5 @@
 import { ProviderType } from "../providers/provider-type";
+import { CredentialReference } from "./credentials";
 
 export const ConfigurationPaths = {
   ConfigFolder: ".ai",
@@ -15,7 +16,7 @@ export type DeepPartial<T> = T extends object
   : T;
 
 export interface Configuration {
-  apiKey: string;
+  apiKey: string | CredentialReference;
   baseURL: string;
   model: string;
 
@@ -50,17 +51,28 @@ export interface UIConfiguration {
 }
 
 export interface LangfuseIntegrationConfiguration {
-  secretKey: string;
-  publicKey: string;
+  secretKey: string | CredentialReference;
+  publicKey: string | CredentialReference;
   baseUrl: string;
   //  Note: many other options for langfuse beyond this:
   //  https://langfuse.com/docs/sdk/typescript/guide#trace
   traceName: string;
 }
 
+export interface CliProviderConfiguration {
+  /** Which detected CLI to run, e.g. "codex", "claude", "omp". */
+  tool: string;
+  /** Timeout for a single CLI invocation. */
+  timeoutMs?: number;
+}
+
 export interface ProviderConfiguration {
   name: string;
-  apiKey: string;
+  /**
+   * The API key. Either a plaintext string (legacy, read-only) or a runtime
+   * credential reference which is resolved on demand and never persisted.
+   */
+  apiKey: string | CredentialReference;
   baseURL: string;
   model: string;
   //  This can be used to cross reference against providers in:
@@ -70,6 +82,15 @@ export interface ProviderConfiguration {
   type?: ProviderType;
   //  Optional prompt override.
   prompt?: string;
+  /** Extra HTTP headers for OpenAI-compatible endpoints. */
+  headers?: Record<string, string | CredentialReference>;
+  /**
+   * Header used to carry the API key for custom OpenAI-compatible endpoints.
+   * Defaults to the Authorization bearer header used by the OpenAI SDK.
+   */
+  authHeader?: string;
+  /** Settings for `type: cli` providers. */
+  cli?: CliProviderConfiguration;
 }
 
 export function getDefaultConfiguration(): Configuration {

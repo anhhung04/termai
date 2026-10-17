@@ -1,14 +1,15 @@
 import { Langfuse, LangfuseTraceClient } from "langfuse";
 import { Configuration } from "../configuration/configuration";
+import { resolveCredential } from "../configuration/credentials";
 
 export type LangfuseIntegrationContext = {
   langfuse: Langfuse;
   trace: LangfuseTraceClient;
 };
 
-export function integrateLangfuse(
+export async function integrateLangfuse(
   config: Configuration,
-): LangfuseIntegrationContext | undefined {
+): Promise<LangfuseIntegrationContext | undefined> {
   //  If we have not provided any langfuse config, we have no integration.
   const lfConfig = config.integrations?.langfuse;
   if (lfConfig === undefined) {
@@ -16,9 +17,11 @@ export function integrateLangfuse(
   }
 
   //  Create the langfuse object and start a trace.
+  const secretKey = await resolveCredential(lfConfig.secretKey);
+  const publicKey = await resolveCredential(lfConfig.publicKey);
   const langfuse = new Langfuse({
-    secretKey: lfConfig.secretKey,
-    publicKey: lfConfig.publicKey,
+    secretKey,
+    publicKey,
     baseUrl: lfConfig.baseUrl,
   });
   const trace = langfuse.trace({
